@@ -108,9 +108,11 @@ def load_vqa_bio_label_maps(label_map_path):
 
 
 def set_seed(seed=1024):
-    random.seed(seed)
+    # random.seed(seed)
     np.random.seed(seed)
     paddle.seed(seed)
+    # FIXME: fix seeds for reproducibility
+    random.seed(seed)
 
 
 class AverageMeter:

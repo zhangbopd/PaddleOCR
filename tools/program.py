@@ -35,6 +35,14 @@ from ppocr.utils.loggers import VDLLogger, WandbLogger, Loggers
 from ppocr.utils import profiler
 from ppocr.data import build_dataloader
 
+# FIXME: For Time-only profile
+# import paddle.profiler as pro
+# FIXME: For nsys Timeline profile
+# import paddle.fluid.core as core
+# import sys
+# nsys profile --stats true -w true -t cuda,nvtx,osrt,cudnn,cublas -s cpu --capture-range=cudaProfilerApi -x true --force-overwrite true -o ${output_filename}
+# python train.py ...
+
 
 class ArgsParser(ArgumentParser):
     def __init__(self):
@@ -234,6 +242,10 @@ def train(config,
     max_iter = len(train_dataloader) - 1 if platform.system(
     ) == "Windows" else len(train_dataloader)
 
+    # FIXME: For Time-only profile
+    # p = pro.Profiler(timer_only=True)
+    # p.start()
+    # print("Start time_only profiling...")
     for epoch in range(start_epoch, epoch_num + 1):
         if train_dataloader.dataset.need_reset:
             train_dataloader = build_dataloader(
@@ -241,8 +253,27 @@ def train(config,
             max_iter = len(train_dataloader) - 1 if platform.system(
             ) == "Windows" else len(train_dataloader)
         for idx, batch in enumerate(train_dataloader):
+            # FIXME: Model default profiler
             profiler.add_profiler_step(profiler_options)
             train_reader_cost += time.time() - reader_start
+            # FIXME: For nsys Timeline profile
+            # if i == 10:
+            #     core.nvprof_start()
+            #     core.nvprof_enable_record_event()
+            #     core.nvprof_nvtx_push(str(i))
+            # if i == 20:
+            #     core.nvprof_nvtx_pop()
+            #     core.nvprof_stop()
+            #     sys.exit()
+            # if i > 100 and i < 110:
+            #     core.nvprof_nvtx_pop()
+            #     core.nvprof_nvtx_push(str(i))
+
+            # FIXME: For OP-details profile
+            # if i == 0:
+            #     paddle.fluid.profiler.start_profiler("GPU", "Default")
+            # if i == 100:
+            #     paddle.fluid.profiler.stop_profiler("total", "video.profile")
             if idx >= max_iter:
                 break
             lr = optimizer.get_lr()
@@ -398,6 +429,8 @@ def train(config,
                         metadata=best_model_dict)
 
             reader_start = time.time()
+            # FIXME: For Time-only profile
+            # p.step()
         if dist.get_rank() == 0:
             save_model(
                 model,
@@ -430,6 +463,10 @@ def train(config,
                 log_writer.log_model(
                     is_best=False, prefix='iter_epoch_{}'.format(epoch))
 
+    # FIXME: For Time-only profile
+    # p.stop()
+    # print("Stop time_only profiling...")
+    print("Stop time_only profiling...")
     best_str = 'best metric, {}'.format(', '.join(
         ['{}: {}'.format(k, v) for k, v in best_model_dict.items()]))
     logger.info(best_str)
