@@ -13,6 +13,7 @@ This section uses the icdar2015 dataset as an example to introduce the training,
   * [2.5 Distributed Training](#25-distributed-training)
   * [2.6 Training with knowledge distillation](#26)
   * [2.7 Training on other platform(Windows/macOS/Linux DCU)](#27)
+  * [2.8 Fine-tuning](#28)
 - [3. Evaluation and Test](#3-evaluation-and-test)
   - [3.1 Evaluation](#31-evaluation)
   - [3.2 Test](#32-test)
@@ -51,7 +52,7 @@ python3 tools/train.py -c configs/det/det_mv3_db.yml  \
          -o Global.pretrained_model=./pretrain_models/MobileNetV3_large_x0_5_pretrained
 ```
 
-In the above instruction, use `-c` to select the training to use the `configs/det/det_db_mv3.yml` configuration file.
+In the above instruction, use `-c` to select the training to use the `configs/det/det_mv3_db.yml` configuration file.
 For a detailed explanation of the configuration file, please refer to [config](./config_en.md).
 
 You can also use `-o` to change the training parameters without modifying the yml file. For example, adjust the training learning rate to 0.0001
@@ -177,6 +178,10 @@ GPU mode is not supported, you need to set `use_gpu` to False in the configurati
 
 - Linux DCU
 Running on a DCU device requires setting the environment variable `export HIP_VISIBLE_DEVICES=0,1,2,3`, and the rest of the training and evaluation prediction commands are exactly the same as the Linux GPU.
+
+### 2.8 Fine-tuning
+
+In actual use, it is recommended to load the official pre-trained model and fine-tune it in your own data set. For the fine-tuning method of the detection model, please refer to: [Model Fine-tuning Tutorial](./finetune_en.md).
 
 ## 3. Evaluation and Test
 

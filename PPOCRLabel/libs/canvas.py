@@ -611,8 +611,8 @@ class Canvas(QWidget):
 
         if self.drawing() and not self.prevPoint.isNull() and not self.outOfPixmap(self.prevPoint):
             p.setPen(QColor(0, 0, 0))
-            p.drawLine(self.prevPoint.x(), 0, self.prevPoint.x(), self.pixmap.height())
-            p.drawLine(0, self.prevPoint.y(), self.pixmap.width(), self.prevPoint.y())
+            p.drawLine(int(self.prevPoint.x()), 0, int(self.prevPoint.x()), self.pixmap.height())
+            p.drawLine(0, int(self.prevPoint.y()), self.pixmap.width(), int(self.prevPoint.y()))
 
         self.setAutoFillBackground(True)
         if self.verified:
@@ -624,6 +624,13 @@ class Canvas(QWidget):
             pal.setColor(self.backgroundRole(), QColor(232, 232, 232, 255))
             self.setPalette(pal)
 
+        # adaptive BBOX label & index font size
+        if self.pixmap:
+            h, w = self.pixmap.size().height(), self.pixmap.size().width()
+            fontszie = int(max(h, w) / 48)
+            for s in self.shapes:
+                s.fontsize = fontszie
+        
         p.end()
 
     def fillDrawing(self):

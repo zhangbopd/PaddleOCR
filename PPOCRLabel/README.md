@@ -1,10 +1,14 @@
 English | [简体中文](README_ch.md)
 
-# PPOCRLabel
+# PPOCRLabelv2
 
-PPOCRLabel is a semi-automatic graphic annotation tool suitable for OCR field, with built-in PPOCR model to automatically detect and re-recognize data. It is written in python3 and pyqt5, supporting rectangular box, table and multi-point annotation modes. Annotations can be directly used for the training of PPOCR detection and recognition models.
+PPOCRLabelv2 is a semi-automatic graphic annotation tool suitable for OCR field, with built-in PP-OCR model to automatically detect and re-recognize data. It is written in Python3 and PyQT5, supporting rectangular box, table, irregular text and key information annotation modes. Annotations can be directly used for the training of PP-OCR detection and recognition models.
 
-<img src="./data/gif/steps_en.gif" width="100%"/>
+|               regular text annotation               |                table annotation                |
+| :-------------------------------------------------: | :--------------------------------------------: |
+|  <img src="./data/gif/steps_en.gif" width="80%"/>   | <img src="./data/gif/table.gif" width="100%"/> |
+|            **irregular text annotation**            |         **key information annotation**         |
+| <img src="./data/gif/multi-point.gif" width="80%"/> |  <img src="./data/gif/kie.gif" width="100%"/>  |
 
 ### Recent Update
 
@@ -99,11 +103,11 @@ python PPOCRLabel.py --kie True # [KIE mode] for [detection + recognition + keyw
 ```
 
 #### 1.2.3 Build and Install the Whl Package Locally
-Compile and install a new whl package, where 1.0.2 is the version number, you can specify the new version in 'setup.py'.
+Compile and install a new whl package, where 0.0.0 is the version number, you can specify the new version in 'setup.py'.
 ```bash
-cd PaddleOCR/PPOCRLabel
+cd ./PPOCRLabel
 python3 setup.py bdist_wheel
-pip3 install dist/PPOCRLabel-1.0.2-py2.py3-none-any.whl
+pip3 install dist/PPOCRLabel-0.0.0-py2.py3-none-any.whl
 ```
 
 
@@ -142,14 +146,18 @@ In PPOCRLabel, complete the text information labeling (text and position), compl
 labeling in the Excel file, the recommended steps are:
 
 1. Table annotation: After opening the table picture, click on the `Table Recognition` button in the upper right corner of PPOCRLabel, which will call the table recognition model in PP-Structure to automatically label 
-the table and pop up Excel at the same time.
-   
+    the table and pop up Excel at the same time.
+
 2. Change the recognition result: **label each cell** (i.e. the text in a cell is marked as a box). Right click on the box and click on `Cell Re-recognition`. 
    You can use the model to automatically recognise the text within a cell.
-   
+
 3. Mark the table structure: for each cell contains the text, **mark as any identifier (such as `1`) in Excel**, to ensure that the merged cell structure is same as the original picture.
 
-4. Export JSON format annotation: close all Excel files corresponding to table images, click `File`-`Export table JSON annotation` to obtain JSON annotation results.
+	> Note: If there are blank cells in the table, you also need to mark them with a bounding box so that the total number of cells is the same as in the image.
+
+4. ***Adjust cell order:*** Click on the menu  `View` - `Show Box Number` to show the box ordinal numbers, and drag all the results under the 'Recognition Results' column on the right side of the software interface to make the box numbers are arranged from left to right, top to bottom
+
+5. Export JSON format annotation: close all Excel files corresponding to table images, click `File`-`Export table JSON annotation` to obtain JSON annotation results.
 
 ### 2.3 Note
 
@@ -219,14 +227,7 @@ PPOCRLabel supports three ways to export Label.txt
 
 - Close application export
 
-
-### 3.4 Export Partial Recognition Results
-
-For some data that are difficult to recognize, the recognition results will not be exported by **unchecking** the corresponding tags in the recognition results checkbox. The unchecked recognition result is saved as `True` in the `difficult` variable in the label file `label.txt`.
-
-> *Note: The status of the checkboxes in the recognition results still needs to be saved manually by clicking Save Button.*
-
-### 3.5 Dataset division
+### 3.4 Dataset division
 
 - Enter the following command in the terminal to execute the dataset division script:
 
@@ -255,7 +256,7 @@ For some data that are difficult to recognize, the recognition results will not 
     | ...
   ```
   
-### 3.6 Error message
+### 3.5 Error message
 
 - If paddleocr is installed with whl, it has a higher priority than calling PaddleOCR class with paddleocr.py, which may cause an exception if whl package is not updated.
 
