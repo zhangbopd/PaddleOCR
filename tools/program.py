@@ -38,10 +38,10 @@ from ppocr.utils import profiler
 from ppocr.data import build_dataloader
 
 # FIXME: For Time-only profile
-# import paddle.profiler as pro
+import paddle.profiler as pro
+
 # FIXME: For nsys Timeline profile
 # import paddle.fluid.core as core
-# import sys
 # nsys profile --stats true -w true -t cuda,nvtx,osrt,cudnn,cublas -s cpu --capture-range=cudaProfilerApi -x true --force-overwrite true -o ${output_filename}
 # python train.py ...
 
@@ -258,8 +258,11 @@ def train(config,
 
     # FIXME: For Time-only profile
     # p = pro.Profiler(timer_only=True)
-    # p.start()
-    # print("Start time_only profiling...")
+    p = pro.Profiler(
+        targets=[pro.ProfilerTarget.CPU, pro.ProfilerTarget.GPU],
+        scheduler=[10, 20],
+        timer_only=False)
+    p.start()
     for epoch in range(start_epoch, epoch_num + 1):
         if train_dataloader.dataset.need_reset:
             train_dataloader = build_dataloader(
@@ -269,7 +272,7 @@ def train(config,
 
         for idx, batch in enumerate(train_dataloader):
             # FIXME: Model default profiler
-            profiler.add_profiler_step(profiler_options)
+            # profiler.add_profiler_step(profiler_options)
             train_reader_cost += time.time() - reader_start
             # FIXME: For nsys Timeline profile
             # if i == 10:
@@ -459,7 +462,7 @@ def train(config,
 
             reader_start = time.time()
             # FIXME: For Time-only profile
-            # p.step()
+            p.step(num_samples=8)
         if dist.get_rank() == 0:
             save_model(
                 model,
@@ -493,9 +496,8 @@ def train(config,
                     is_best=False, prefix='iter_epoch_{}'.format(epoch))
 
     # FIXME: For Time-only profile
-    # p.stop()
-    # print("Stop time_only profiling...")
-    print("Stop time_only profiling...")
+    p.stop()
+    p.summary()
     best_str = 'best metric, {}'.format(', '.join(
         ['{}: {}'.format(k, v) for k, v in best_model_dict.items()]))
     logger.info(best_str)
